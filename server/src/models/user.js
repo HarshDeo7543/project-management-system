@@ -55,6 +55,15 @@ class User extends Model {
   async validatePassword(password) {
     return bcrypt.compare(password, this.password);
   }
+
+  static associate(models) {
+    // A user can be part of many teams
+    this.belongsToMany(models.Team, { 
+      through: 'TeamMembers', 
+      foreignKey: 'userId',
+      as: 'teams'
+    });
+  }
 }
 
 module.exports = User;

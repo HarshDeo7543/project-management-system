@@ -10,7 +10,7 @@ router.get('/', authenticateToken, async (req, res) => {
     const { assignedTo } = req.query;
     const where = {};
     if (assignedTo) where.assignedToId = assignedTo;
-    const tasks = await Task.findAll({ where, include: [{ model: User, as: 'assignedTo', attributes: ['id', 'name', 'email'] }, { model: Project }] });
+    const tasks = await Task.findAll({ where, include: [{ model: User, as: 'assignedTo', attributes: ['id', 'name', 'email'] }, { model: Project, as: 'project' }] });
     res.json(tasks);
   } catch (err) {
     console.error(err);

@@ -8,6 +8,7 @@ const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
 const dashboardRoutes = require('./routes/dashboard');
 const userRoutes = require('./routes/users');
+const teamRoutes = require('./routes/teams');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 
@@ -20,6 +21,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/teams', teamRoutes);
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -29,7 +31,7 @@ async function start() {
   try {
     await sequelize.authenticate();
     console.log('DB connected');
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error('Unable to start', err);

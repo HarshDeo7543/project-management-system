@@ -1,16 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { Project, User, Task } = require('../models');
+const { Project, User, Task, Team } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
 const { permit } = require('../middleware/roles');
 
-// Get all projects
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const projects = await Project.findAll({ include: [{ model: User, as: 'teamMembers', attributes: ['id', 'name', 'email', 'role'] }, { model: Task }] });
+    const projects = await Project.findAll({ 
+      include: [
+        { model: Team, as: 'team', include: [{ model: User, as: 'members', attributes: ['id', 'name', 'email', 'role'] }] },
+        { model: Task, as: 'tasks' }
+      ]
+    });
     // compute simple progress
     const result = projects.map(p => {
-      const tasks = p.Tasks || [];
+      const tasks = p.tasks || [];
       const done = tasks.filter(t => t.status === 'Done').length;
       const total = tasks.length;
       const progress = total === 0 ? 0 : Math.round((done / total) * 100);
@@ -30,14 +34,14 @@ router.get('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const project = await Project.findByPk(id, {
       include: [
-        { model: User, as: 'teamMembers', attributes: ['id', 'name', 'email', 'role'] },
-        { model: Task, include: [{ model: User, as: 'assignedTo', attributes: ['id', 'name'] }] }
+        { model: Team, as: 'team', include: [{ model: User, as: 'members', attributes: ['id', 'name', 'email', 'role'] }] },
+        { model: Task, as: 'tasks', include: [{ model: User, as: 'assignedTo', attributes: ['id', 'name'] }] }
       ]
     });
 
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
-    const tasks = project.Tasks || [];
+    const tasks = project.tasks || [];
     const done = tasks.filter(t => t.status === 'Done').length;
     const total = tasks.length;
     const progress = total === 0 ? 0 : Math.round((done / total) * 100);
@@ -52,12 +56,8 @@ router.get('/:id', authenticateToken, async (req, res) => {
 // Create project (Manager or Admin)
 router.post('/', authenticateToken, permit('Admin', 'ProjectManager'), async (req, res) => {
   try {
-    const { name, description, deadline, teamMemberIds } = req.body;
-    const project = await Project.create({ name, description, deadline });
-    if (Array.isArray(teamMemberIds) && teamMemberIds.length) {
-      const users = await User.findAll({ where: { id: teamMemberIds } });
-      await project.addTeamMembers(users);
-    }
+    const { name, description, deadline, teamId } = req.body;
+    const project = await Project.create({ name, description, deadline, teamId });
     res.status(201).json(project);
   } catch (err) {
     console.error(err);
@@ -69,14 +69,10 @@ router.post('/', authenticateToken, permit('Admin', 'ProjectManager'), async (re
 router.put('/:id', authenticateToken, permit('Admin', 'ProjectManager'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, deadline, teamMemberIds } = req.body;
+    const { name, description, deadline, teamId } = req.body;
     const project = await Project.findByPk(id);
     if (!project) return res.status(404).json({ message: 'Not found' });
-    await project.update({ name, description, deadline });
-    if (Array.isArray(teamMemberIds)) {
-      const users = await User.findAll({ where: { id: teamMemberIds } });
-      await project.setTeamMembers(users);
-    }
+    await project.update({ name, description, deadline, teamId });
     res.json(project);
   } catch (err) {
     console.error(err);

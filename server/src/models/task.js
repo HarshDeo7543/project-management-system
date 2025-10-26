@@ -25,6 +25,20 @@ class Task extends Model {
         },
         comments: {
           type: DataTypes.TEXT,
+        },
+        projectId: {
+          type: DataTypes.UUID,
+          references: {
+            model: 'Projects',
+            key: 'id'
+          }
+        },
+        assignedToId: {
+          type: DataTypes.UUID,
+          references: {
+            model: 'Users',
+            key: 'id'
+          }
         }
       },
       {
@@ -34,6 +48,17 @@ class Task extends Model {
       }
     );
     return Task;
+  }
+
+  static associate(models) {
+    this.belongsTo(models.Project, {
+      foreignKey: 'projectId',
+      as: 'project'
+    });
+    this.belongsTo(models.User, {
+      foreignKey: 'assignedToId',
+      as: 'assignedTo'
+    });
   }
 }
 

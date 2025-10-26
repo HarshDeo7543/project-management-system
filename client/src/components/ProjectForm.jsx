@@ -5,16 +5,16 @@ export default function ProjectForm({ onSave, projectToEdit, onCancel }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
-  const [teamMemberIds, setTeamMemberIds] = useState([]);
+  const [teamId, setTeamId] = useState('');
   
-  const [allUsers, setAllUsers] = useState([]);
+  const [allTeams, setAllTeams] = useState([]);
   const [error, setError] = useState('');
 
-  // Fetch users for the team member selection
+  // Fetch teams for the dropdown
   useEffect(() => {
-    api.get('/users')
-      .then(res => setAllUsers(res.data))
-      .catch(() => setError('Could not load users for team selection.'));
+    api.get('/teams')
+      .then(res => setAllTeams(res.data))
+      .catch(() => setError('Could not load teams.'));
   }, []);
 
   // If we are editing, populate the form with existing project data
@@ -22,15 +22,13 @@ export default function ProjectForm({ onSave, projectToEdit, onCancel }) {
     if (projectToEdit) {
       setName(projectToEdit.name || '');
       setDescription(projectToEdit.description || '');
-      // Format date for input field, which expects YYYY-MM-DD
       setDeadline(projectToEdit.deadline ? new Date(projectToEdit.deadline).toISOString().split('T')[0] : '');
-      setTeamMemberIds(projectToEdit.teamMembers ? projectToEdit.teamMembers.map(m => m.id) : []);
+      setTeamId(projectToEdit.teamId || '');
     } else {
-      // If creating new, reset form
       setName('');
       setDescription('');
       setDeadline('');
-      setTeamMemberIds([]);
+      setTeamId('');
     }
   }, [projectToEdit]);
 
@@ -40,7 +38,7 @@ export default function ProjectForm({ onSave, projectToEdit, onCancel }) {
       setError('Project name is required.');
       return;
     }
-    const projectData = { name, description, deadline, teamMemberIds };
+    const projectData = { name, description, deadline, teamId };
     onSave(projectData);
   };
 
@@ -55,7 +53,6 @@ export default function ProjectForm({ onSave, projectToEdit, onCancel }) {
           value={name}
           onChange={e => setName(e.target.value)}
           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          placeholder="e.g., New Website Launch"
         />
       </div>
 
@@ -66,7 +63,6 @@ export default function ProjectForm({ onSave, projectToEdit, onCancel }) {
           onChange={e => setDescription(e.target.value)}
           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
           rows="3"
-          placeholder="A brief summary of the project"
         ></textarea>
       </div>
 
@@ -81,20 +77,19 @@ export default function ProjectForm({ onSave, projectToEdit, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Team Members</label>
+        <label className="block text-sm font--medium text-gray-700">Assign to Team</label>
         <select 
-          multiple
-          value={teamMemberIds}
-          onChange={e => setTeamMemberIds(Array.from(e.target.selectedOptions, option => option.value))}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 h-32"
+          value={teamId}
+          onChange={e => setTeamId(e.target.value)}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
         >
-          {allUsers.map(user => (
-            <option key={user.id} value={user.id}>
-              {user.name} ({user.role})
+          <option value="">No Team</option>
+          {allTeams.map(team => (
+            <option key={team.id} value={team.id}>
+              {team.name}
             </option>
           ))}
         </select>
-        <p className="text-xs text-gray-500 mt-1">Hold Ctrl or Cmd to select multiple users.</p>
       </div>
 
       <div className="flex justify-end gap-4 pt-4">
