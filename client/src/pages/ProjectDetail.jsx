@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import api from '../api/axios';
 import Modal from '../components/Modal';
 import TaskForm from '../components/TaskForm';
+import AIStoriesModal from '../components/AIStoriesModal';
 
 export default function ProjectDetail() {
   const [project, setProject] = useState(null);
@@ -12,6 +13,7 @@ export default function ProjectDetail() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
   // Get logged-in user from localStorage to check roles
   const currentUser = useMemo(() => {
@@ -41,6 +43,14 @@ export default function ProjectDetail() {
   const openCreateModal = () => {
     setTaskToEdit(null);
     setIsModalOpen(true);
+  };
+
+  const openAIModal = () => {
+    setIsAIModalOpen(true);
+  };
+
+  const closeAIModal = () => {
+    setIsAIModalOpen(false);
   };
 
   const openEditModal = (task) => {
@@ -82,7 +92,10 @@ export default function ProjectDetail() {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">{project.name}</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-800">{project.name}</h1>
+          <button onClick={openAIModal} className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 shadow-sm">Generate Stories with AI</button>
+        </div>
         <p className="text-md text-gray-600 mt-2">{project.description}</p>
         {project.deadline && <p className="text-sm text-gray-500 mt-1">Deadline: {new Date(project.deadline).toLocaleDateString()}</p>}
       </div>
@@ -96,7 +109,9 @@ export default function ProjectDetail() {
         <div className="md:col-span-2">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-gray-700">Tasks</h2>
-            {isManagerOrAdmin && <button onClick={openCreateModal} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 shadow-sm">Create Task</button>}
+            <div className="flex gap-2">
+              {isManagerOrAdmin && <button onClick={openCreateModal} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 shadow-sm">Create Task</button>}
+            </div>
           </div>
           <div className="space-y-4">
             {(project.Tasks && project.Tasks.length > 0) ? project.Tasks.map(task => {
@@ -132,12 +147,32 @@ export default function ProjectDetail() {
               </div>
             ))}
           </div>
+
+          {project.userStories && project.userStories.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-2xl font-semibold text-gray-700 mb-4">AI Generated User Stories</h2>
+              <div className="space-y-3">
+                {project.userStories.map((story, index) => (
+                  <div key={index} className="bg-purple-50 p-3 rounded-lg shadow-sm border-l-4 border-purple-500">
+                    <p className="text-sm text-gray-800">{story}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={taskToEdit ? 'Edit Task' : 'Create Task'}>
         <TaskForm onSave={handleSaveTask} taskToEdit={taskToEdit} onCancel={closeModal} teamMembers={project.teamMembers} />
       </Modal>
+
+      <AIStoriesModal
+        isOpen={isAIModalOpen}
+        onClose={closeAIModal}
+        projectId={id}
+        onStoriesGenerated={loadProject}
+      />
     </div>
   );
 }

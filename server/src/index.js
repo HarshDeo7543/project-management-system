@@ -9,6 +9,7 @@ const taskRoutes = require('./routes/tasks');
 const dashboardRoutes = require('./routes/dashboard');
 const userRoutes = require('./routes/users');
 const teamRoutes = require('./routes/teams');
+const aiRoutes = require('./routes/ai');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 
@@ -22,6 +23,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/teams', teamRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

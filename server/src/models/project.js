@@ -25,6 +25,11 @@ class Project extends Model {
             model: 'Teams',
             key: 'id'
           }
+        },
+        userStories: {
+          type: DataTypes.JSON,
+          allowNull: true,
+          defaultValue: []
         }
       },
       {
