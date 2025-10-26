@@ -1,51 +1,62 @@
-import React, { useEffect, useState } from 'react'
-import api from '../api/axios'
+import React, { useEffect, useState } from 'react';
+import api from '../api/axios';
+
+// A simple card component for displaying stats
+function StatCard({ title, value, bgColor = 'bg-white' }) {
+  return (
+    <div className={`${bgColor} p-4 rounded-lg shadow-md`}>
+      <div className="text-sm text-gray-700">{title}</div>
+      <div className="text-2xl font-bold text-gray-900">{value}</div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
-  const [projects, setProjects] = useState([])
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    api.get('/projects').then(r => setProjects(r.data)).catch(() => {})
-  }, [])
+    api.get('/dashboard')
+      .then(response => {
+        setStats(response.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError('Failed to load dashboard data.');
+        setLoading(false);
+      });
+  }, []);
 
-  const totalTasksByStatus = projects.reduce((acc, p) => {
-    if (!p.Tasks) return acc
-    p.Tasks.forEach(t => acc[t.status] = (acc[t.status] || 0) + 1)
-    return acc
-  }, {})
+  if (loading) {
+    return <div className="text-center p-4">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center p-4 text-red-500">{error}</div>;
+  }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-sm text-gray-600">To Do</div>
-          <div className="text-xl">{totalTasksByStatus['To Do'] || 0}</div>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-sm text-gray-600">In Progress</div>
-          <div className="text-xl">{totalTasksByStatus['In Progress'] || 0}</div>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <div className="text-sm text-gray-600">Done</div>
-          <div className="text-xl">{totalTasksByStatus['Done'] || 0}</div>
-        </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
+      
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard title="Total Projects" value={stats.totalProjects} />
+        <StatCard title="Total Tasks" value={stats.totalTasks} />
+        <StatCard title="Tasks To Do" value={stats.tasksByStatus['To Do'] || 0} />
+        <StatCard title="In Progress" value={stats.tasksByStatus['In Progress'] || 0} />
+        <StatCard title="Tasks Done" value={stats.tasksByStatus['Done'] || 0} />
+        <StatCard title="Overdue Tasks" value={stats.overdueTasks} bgColor="bg-red-100" />
       </div>
 
-      <h2 className="text-xl font-semibold mb-2">Projects</h2>
-      <div className="space-y-4">
-        {projects.map(p => (
-          <div key={p.id} className="bg-white p-4 rounded shadow">
-            <div className="flex justify-between">
-              <div>
-                <div className="font-bold">{p.name}</div>
-                <div className="text-sm text-gray-600">Progress: {p.progress}%</div>
-              </div>
-              <div className="text-sm text-gray-500">Team: {p.teamMembers?.map(t => t.name).join(', ')}</div>
-            </div>
-          </div>
-        ))}
+      {/* A placeholder for future content */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold text-gray-700">Welcome</h2>
+        <p className="text-gray-600 mt-2">
+          This is your project management dashboard. More widgets and reports will be added here in the future.
+        </p>
       </div>
     </div>
-  )
+  );
 }

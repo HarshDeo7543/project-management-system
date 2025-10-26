@@ -23,6 +23,32 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
+
+// Get single project
+router.get('/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const project = await Project.findByPk(id, {
+      include: [
+        { model: User, as: 'teamMembers', attributes: ['id', 'name', 'email', 'role'] },
+        { model: Task, include: [{ model: User, as: 'assignedTo', attributes: ['id', 'name'] }] }
+      ]
+    });
+
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+
+    const tasks = project.Tasks || [];
+    const done = tasks.filter(t => t.status === 'Done').length;
+    const total = tasks.length;
+    const progress = total === 0 ? 0 : Math.round((done / total) * 100);
+
+    res.json({ ...project.toJSON(), progress });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Create project (Manager or Admin)
 router.post('/', authenticateToken, permit('Admin', 'ProjectManager'), async (req, res) => {
   try {
@@ -59,7 +85,7 @@ router.put('/:id', authenticateToken, permit('Admin', 'ProjectManager'), async (
 });
 
 // Delete
-router.delete('/:id', authenticateToken, permit('Admin', 'ProjectManager'), async (req, res) => {
+router.delete('/:id', authenticateToken, permit('Admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const project = await Project.findByPk(id);

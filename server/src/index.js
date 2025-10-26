@@ -6,6 +6,8 @@ const { sequelize } = require('./models');
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
+const dashboardRoutes = require('./routes/dashboard');
+const userRoutes = require('./routes/users');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 
@@ -16,6 +18,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', userRoutes);
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
