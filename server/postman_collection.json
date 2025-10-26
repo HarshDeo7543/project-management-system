@@ -1,0 +1,34 @@
+{
+  "info": {
+    "name": "PMS API",
+    "_postman_id": "pms-starter",
+    "description": "A small Postman collection for the starter Project Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Admin\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\",\n  \"role\": \"Admin\"\n}"
+        },
+        "url": {"raw": "http://localhost:4000/api/auth/register","host":["http://localhost:4000/api/auth/register"]}
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}" },
+        "url": {"raw": "http://localhost:4000/api/auth/login","host":["http://localhost:4000/api/auth/login"]}
+      }
+    },
+    {"name":"Get Projects","request":{"method":"GET","header":[],"url":{"raw":"http://localhost:4000/api/projects","host":["http://localhost:4000/api/projects"]}}},
+    {"name":"Create Project","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"New Project\"\n}"},"url":{"raw":"http://localhost:4000/api/projects","host":["http://localhost:4000/api/projects"]}}},
+    {"name":"Get Tasks","request":{"method":"GET","header":[],"url":{"raw":"http://localhost:4000/api/tasks","host":["http://localhost:4000/api/tasks"]}}}
+  ]
+}
