@@ -13,6 +13,7 @@ export default function Login() {
       const { data } = await api.post('/auth/login', { email, password })
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
+      window.dispatchEvent(new Event('userLogin'))
       navigate('/')
     } catch (err) {
       alert(err?.response?.data?.message || 'Login failed')

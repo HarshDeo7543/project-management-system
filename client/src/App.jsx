@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,9 +13,28 @@ import AdminRoute from './components/AdminRoute';
 
 export default function App() {
   // Get user from local storage to conditionally render UI elements
-  const currentUser = useMemo(() => {
+  const [currentUser, setCurrentUser] = useState(() => {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const user = localStorage.getItem('user');
+      setCurrentUser(user ? JSON.parse(user) : null);
+    };
+
+    const handleUserLogin = () => {
+      const user = localStorage.getItem('user');
+      setCurrentUser(user ? JSON.parse(user) : null);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('userLogin', handleUserLogin);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userLogin', handleUserLogin);
+    };
   }, []);
 
   const getDashboardTitle = () => {
