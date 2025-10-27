@@ -27,17 +27,7 @@ app.use('/api/ai', aiRoutes);
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-const PORT = process.env.PORT || 4000;
 
-async function start() {
-  try {
-    await sequelize.authenticate();
-    console.log('DB connected');
-    await sequelize.sync({ alter: true });
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  } catch (err) {
-    console.error('Unable to start', err);
-  }
-}
-
-start();
+// The Vercel environment will handle starting the server.
+// We just need to export the configured express app.
+module.exports = app;
