@@ -22,7 +22,26 @@ router.get('/', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, permit('Admin', 'ProjectManager'), async (req, res) => {
   try {
     const { title, description, status, deadline, assignedToId, projectId } = req.body;
-    const task = await Task.create({ title, description, status, deadline, assignedToId, projectId });
+
+    // Validate required fields
+    if (!title || !projectId) {
+      return res.status(400).json({ message: 'Title and projectId are required' });
+    }
+
+    // If assignedToId is provided and not empty, ensure it's a valid UUID
+    let finalAssignedToId = null;
+    if (assignedToId && assignedToId.trim() !== '') {
+      finalAssignedToId = assignedToId;
+    }
+
+    const task = await Task.create({
+      title,
+      description,
+      status: status || 'To Do',
+      deadline,
+      assignedToId: finalAssignedToId,
+      projectId
+    });
     res.status(201).json(task);
   } catch (err) {
     console.error(err);

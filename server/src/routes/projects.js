@@ -6,7 +6,7 @@ const { permit } = require('../middleware/roles');
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const projects = await Project.findAll({ 
+    const projects = await Project.findAll({
       include: [
         { model: Team, as: 'team', include: [{ model: User, as: 'members', attributes: ['id', 'name', 'email', 'role'] }] },
         { model: Task, as: 'tasks' }
@@ -18,7 +18,11 @@ router.get('/', authenticateToken, async (req, res) => {
       const done = tasks.filter(t => t.status === 'Done').length;
       const total = tasks.length;
       const progress = total === 0 ? 0 : Math.round((done / total) * 100);
-      return { ...p.toJSON(), progress };
+      return {
+        ...p.toJSON(),
+        progress,
+        teamMembers: p.team?.members || [] // Ensure teamMembers is always an array
+      };
     });
     res.json(result);
   } catch (err) {
@@ -46,7 +50,11 @@ router.get('/:id', authenticateToken, async (req, res) => {
     const total = tasks.length;
     const progress = total === 0 ? 0 : Math.round((done / total) * 100);
 
-    res.json({ ...project.toJSON(), progress });
+    res.json({
+      ...project.toJSON(),
+      progress,
+      teamMembers: project.team?.members || []
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

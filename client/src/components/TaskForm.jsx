@@ -87,7 +87,7 @@ export default function TaskForm({ onSave, taskToEdit, onCancel, teamMembers = [
 
       <div>
         <label className="block text-sm font-medium text-gray-700">Assign To</label>
-        <select 
+        <select
           value={assignedToId}
           onChange={e => setAssignedToId(e.target.value)}
           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
@@ -95,7 +95,7 @@ export default function TaskForm({ onSave, taskToEdit, onCancel, teamMembers = [
           <option value="">Unassigned</option>
           {teamMembers.map(member => (
             <option key={member.id} value={member.id}>
-              {member.name}
+              {member.name} ({member.role})
             </option>
           ))}
         </select>
