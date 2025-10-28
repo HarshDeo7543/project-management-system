@@ -142,8 +142,7 @@ This repository contains a full-stack Project Management Tool built with modern 
 ## Contact
 
 **Harsh Deo**  
-Email: harshdeo5142@gmail.com  
-GitHub: [Your GitHub Profile]
+Email: harshdeo5142@gmail.com 
 
 This project demonstrates full-stack development skills including authentication, role-based access control, database design, API development, and modern deployment practices.
 
