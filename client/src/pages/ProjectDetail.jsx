@@ -114,7 +114,7 @@ export default function ProjectDetail() {
             </div>
           </div>
           <div className="space-y-4">
-            {(project.Tasks && project.Tasks.length > 0) ? project.Tasks.map(task => {
+            {(project.tasks && project.tasks.length > 0) ? project.tasks.map(task => {
               const canEdit = isManagerOrAdmin || (currentUser?.role === 'Developer' && task.assignedToId === currentUser.id);
               return (
                 <div key={task.id} className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
