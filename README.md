@@ -18,12 +18,8 @@ This repository contains a full-stack Project Management Tool built with modern 
    ```
 
 2. **Set up PostgreSQL Database**:
-   - Option 1: Using Docker (recommended for local development):
-     ```
-     cd server
-     docker-compose up -d
-     ```
-   - Option 2: Using Neon (for cloud database):
+   
+   - Using Neon (for cloud provided postgreSQL database):
      - Sign up at [neon.tech](https://neon.tech)
      - Create a new project and copy the connection string
      - Update `server/.env` with `DATABASE_URL=your_neon_connection_string`
