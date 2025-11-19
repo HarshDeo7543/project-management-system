@@ -13,4 +13,4 @@ const AdminRoute = () => {
   return isAuthorized ? <Outlet /> : <Navigate to="/" />;
 };
 
-export default AdminRoute; 
+export default AdminRoute;
