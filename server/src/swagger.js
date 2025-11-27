@@ -14,12 +14,12 @@ const options = {
           scheme: 'bearer',
           bearerFormat: 'JWT'
         }
-      }
+      } 
     },
     security: [{ bearerAuth: [] }]
   },
   apis: ['./src/routes/*.js'],
-}; 
+};
 
 const swaggerSpec = swaggerJSDoc(options);
 module.exports = swaggerSpec;
