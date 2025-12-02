@@ -89,7 +89,7 @@ export default function App() {
             <Route path="/admin/teams" element={<Teams />} />
           </Route>
         </Routes>
-      </main> 
+      </main>
     </div>
   );
 }
